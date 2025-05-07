@@ -31,31 +31,60 @@ if (!class_exists('jobportalapi_main')) {
             require_once JP_PLUGIN_PATH . 'includes/jobportalapi_plugin.php';
 
             $this->load_plugin();
-
-
-            
-            register_activation_hook(__FILE__, 'jobportalapi_add_custom_roles');
-
-            function jobportalapi_add_custom_roles()
-            {
-                add_role('employee', 'Employee', [
-                    'read' => true,
-                    'edit_posts' => false,
-                ]);
-
-                add_role('company', 'Company', [
-                    'read' => true,
-                    'edit_posts' => true,
-                    'upload_files' => true,
-                ]);
-            }
+            $this->register_hooks();
         }
 
         public function load_plugin()
         {
-            jobportalapi_plugin::jobportalapi_init();
+            JobPortalAPI_Plugin::jobportalapi_init();
         }
 
+        public function register_hooks()
+        {
+            // Register activation hook
+            register_activation_hook(__FILE__, [$this, 'add_custom_roles']);
+
+            // Admin columns
+            add_filter('manage_application_posts_columns', [$this, 'add_application_status_column']);
+            add_action('manage_application_posts_custom_column', [$this, 'show_application_status_column'], 10, 2);
+        }
+
+        /**
+         * Add custom user roles on plugin activation.
+         */
+        public function add_custom_roles()
+        {
+            add_role('employee', 'Employee', [
+                'read' => true,
+                'edit_posts' => false,
+            ]);
+
+            add_role('company', 'Company', [
+                'read' => true,
+                'edit_posts' => true,
+                'upload_files' => true,
+            ]);
+        }
+
+        /**
+         * Add custom column to Application admin table.
+         */
+        public function add_application_status_column($columns)
+        {
+            $columns['application_status'] = __('Application Status', 'jobportalapi');
+            return $columns;
+        }
+
+        /**
+         * Display custom column content for Application post type.
+         */
+        public function show_application_status_column($column, $post_id)
+        {
+            if ($column === 'application_status') {
+                $status = get_field('application_status', $post_id); // ACF field
+                echo esc_html($status);
+            }
+        }
 
     }
 }

@@ -22,12 +22,6 @@ if (!class_exists('jobportalapi_create_endpoints')) {
                 'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ));
 
-            register_rest_route('jobportalapi/v1', '/companies', array(
-                'methods' => 'GET',
-                'callback' => array('jobportalapi_endpoints_callbacks', 'get_companies'),
-                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
-            ));
-
             // 🔥 New endpoints for single job and company
             register_rest_route('jobportalapi/v1', '/job', array(
                 'methods' => 'GET',
@@ -35,23 +29,11 @@ if (!class_exists('jobportalapi_create_endpoints')) {
                 'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ));
 
-            register_rest_route('jobportalapi/v1', '/company', array(
-                'methods' => 'GET',
-                'callback' => array('jobportalapi_endpoints_callbacks', 'get_single_company'),
-                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
-            ));
 
             // Create a new Job
             register_rest_route('jobportalapi/v1', '/job', array(
                 'methods' => 'POST',
                 'callback' => array('jobportalapi_endpoints_callbacks', 'create_job'),
-                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
-            ));
-
-            // Create a new Company
-            register_rest_route('jobportalapi/v1', '/company', array(
-                'methods' => 'POST',
-                'callback' => array('jobportalapi_endpoints_callbacks', 'create_company'),
                 'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ));
 
@@ -62,13 +44,6 @@ if (!class_exists('jobportalapi_create_endpoints')) {
                 'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ));
 
-            //update compnay
-            register_rest_route('jobportalapi/v1', '/company', array(
-                'methods' => 'PUT',
-                'callback' => array('jobportalapi_endpoints_callbacks', 'update_company'),
-                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
-            ));
-
             //delete job 
             register_rest_route('jobportalapi/v1', '/job', array(
                 'methods' => 'DELETE',
@@ -76,24 +51,131 @@ if (!class_exists('jobportalapi_create_endpoints')) {
                 'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ));
 
-            //delete company 
-            register_rest_route('jobportalapi/v1', '/company', array(
-                'methods' => 'DELETE',
-                'callback' => array('jobportalapi_endpoints_callbacks', 'delete_company'),
-                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
-            ));
-
             //register and login users 
             register_rest_route('jobportalapi/v1', '/register', [
                 'methods' => 'POST',
                 'callback' => array('jobportalapi_endpoints_callbacks', 'jobportalapi_register_user'),
-                'permission_callback' => '__return_true' // No authentication required for registration
+                // 'permission_callback' => '__return_true' // No authentication required for registration
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ]);
 
             register_rest_route('jobportalapi/v1', '/login', [
                 'methods' => 'POST',
                 'callback' => array('jobportalapi_endpoints_callbacks', 'jobportalapi_login_user'),
-                'permission_callback' => '__return_true' // No authentication required for login
+                // 'permission_callback' => '__return_true' // No authentication required for login
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+
+            register_rest_route('jobportalapi/v1', '/validate', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'jobportalapi_validate_user_session'],
+                'permission_callback' => '__return_true',
+            ]);
+
+
+            register_rest_route('jobportalapi/v1', '/logout', [
+                'methods' => 'POST',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'user_logout'],
+                'permission_callback' => '__return_true',
+            ]);
+
+            register_rest_route('jobportalapi/v1', '/update-user', [
+                'methods' => 'PUT',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'jobportalapi_update_user'],
+                // 'permission_callback' => '__return_true', // Or validate token if you want secure
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+
+            register_rest_route('jobportalapi/v1', '/get-user', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'jobportalapi_get_user'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            register_rest_route('jobportalapi/v1', '/companies', array(
+                'methods' => 'GET',
+                'callback' => array('jobportalapi_endpoints_callbacks', 'get_companies'),
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ));
+
+            register_rest_route('jobportalapi/v1', '/company', array(
+                'methods' => 'GET',
+                'callback' => array('jobportalapi_endpoints_callbacks', 'get_single_company'),
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ));
+
+
+            register_rest_route('jobportalapi/v1', '/get-all-users', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'jobportalapi_get_all_users'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+
+            //apply job
+            register_rest_route('jobportalapi/v1', '/apply-job', [
+                'methods' => 'POST',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'apply_job'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            register_rest_route('jobportalapi/v1', '/get-applications', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'get_user_applications'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+
+
+
+
+
+
+
+
+
+            // Update application status (for employers)
+            register_rest_route('jobportalapi/v1', '/update-application-status', [
+                'methods' => 'PUT',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'update_application_status'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            // Get applications for a specific job (for employers)
+            register_rest_route('jobportalapi/v1', '/job-applications', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'get_job_applications'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            // Update an existing application (for applicants)
+            register_rest_route('jobportalapi/v1', '/update-application', [
+                'methods' => 'PUT',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'update_application'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            // Withdraw an application (for applicants)
+            register_rest_route('jobportalapi/v1', '/withdraw-application', [
+                'methods' => 'PUT',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'withdraw_application'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            // Get application statistics (for employers)
+            register_rest_route('jobportalapi/v1', '/application-statistics', [
+                'methods' => 'GET',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'get_application_statistics'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
+            ]);
+
+            // Schedule interview (for employers)
+            register_rest_route('jobportalapi/v1', '/schedule-interview', [
+                'methods' => 'POST',
+                'callback' => ['jobportalapi_endpoints_callbacks', 'schedule_interview'],
+                'permission_callback' => array('jobportalapi_create_endpoints', 'set_authentication_token')
             ]);
         }
 
@@ -122,6 +204,9 @@ if (!class_exists('jobportalapi_create_endpoints')) {
                 if (!$validation_result) {
                     return new WP_Error('rest_forbidden', 'Invalid or expired token', ['status' => 403]);
                 }
+
+                // ✨ Set the authenticated user!
+                wp_set_current_user($validation_result['user_id']);
 
                 // Add user data to the request
                 $request->set_param('user_id', $validation_result['user_id']);

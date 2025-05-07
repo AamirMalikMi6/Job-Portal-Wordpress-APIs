@@ -16,8 +16,16 @@ if (!class_exists('jobportalapi_endpoints')) {
         {
             add_action('rest_api_init', array(__CLASS__, 'jobportalapi_register_endpoints'));
         }
-        public static function jobportalapi_register_endpoints() {
-            jobportalapi_create_endpoints::jobportalapi_init_endpoints();  
+        public static function jobportalapi_register_endpoints()
+        {
+            jobportalapi_create_endpoints::jobportalapi_init_endpoints();
+            remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
+            add_filter('rest_pre_serve_request', function ($value) {
+                header("Access-Control-Allow-Origin: https://jobportal.arshadwpdev.com");
+                // header("Access-Control-Allow-Origin: http://localhost:5173");
+                header("Access-Control-Allow-Credentials: true");
+                return $value;
+            });
         }
     }
 }
